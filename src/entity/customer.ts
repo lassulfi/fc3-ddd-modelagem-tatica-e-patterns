@@ -2,15 +2,27 @@ class Customer {
     _id: string;
     _name: string;
     _address: string = ""; // opcional
-    _active: boolean = true;
+    _active: boolean = false;
 
     constructor(id: string, name: string) {
         this._id = id;
         this._name = name;
+        this.validate();
+    }
+
+    validate() {
+        if (this._name.length === 0) {
+            throw new Error("Name is required");
+        }
+
+        if (this._id.length === 0) {
+            throw new Error("Id is required");
+        }
     }
 
     changeName(name: string) {
         this._name = name;
+        this.validate();
     }
 
     changeAddress(address: string) {
@@ -18,6 +30,11 @@ class Customer {
     }
 
     activate() {
+        // Regra de negocio: o cliente so pode ser ativado se tiver um
+        // endereco para emissao de nota fiscal
+        if (this._address.length === 0) {
+            throw new Error("Address is mandatory to activate a customer");
+        }
         this._active = true;
     }
 
@@ -33,3 +50,6 @@ class Customer {
 // Dados consistentes
 // devem estar disponiveis em todo o sistema
 let customer = new Customer("123", "Maria de Fatima");
+
+// Uma entidade por padrão deve ser sempre autovalidada
+// Se ela não se auto-valida há chance de gerar inconsistência
