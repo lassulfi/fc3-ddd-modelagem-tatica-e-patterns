@@ -1,8 +1,10 @@
+import Address from "./address";
+
 // Entidade focada em negocio
 class Customer {
     _id: string;
     _name: string;
-    _address: string = ""; // opcional
+    _address!: Address; // opcional
     _active: boolean = false;
 
     constructor(id: string, name: string) {
@@ -26,14 +28,14 @@ class Customer {
         this.validate();
     }
 
-    changeAddress(address: string) {
+    changeAddress(address: Address) {
         this._address = address;
     }
 
     activate() {
         // Regra de negocio: o cliente so pode ser ativado se tiver um
         // endereco para emissao de nota fiscal
-        if (this._address.length === 0) {
+        if (!this._address) {
             throw new Error("Address is mandatory to activate a customer");
         }
         this._active = true;
@@ -50,7 +52,7 @@ class Customer {
 
 // Dados consistentes
 // devem estar disponiveis em todo o sistema
-let customer = new Customer("123", "Maria de Fatima");
+// let customer = new Customer("123", "Maria de Fatima");
 
 // Uma entidade por padrão deve ser sempre autovalidada
 // Se ela não se auto-valida há chance de gerar inconsistência
