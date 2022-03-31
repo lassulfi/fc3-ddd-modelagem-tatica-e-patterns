@@ -1,3 +1,4 @@
+// Entidade focada em negocio
 class Customer {
     _id: string;
     _name: string;
@@ -53,3 +54,14 @@ let customer = new Customer("123", "Maria de Fatima");
 
 // Uma entidade por padrão deve ser sempre autovalidada
 // Se ela não se auto-valida há chance de gerar inconsistência
+
+// Entidade vs ORM
+// Esta entidade deste arquivo é focada em negocio.
+// O ORM necessita de uma entidade focada em persistencia (model)
+// Exemplo de estruturacao de arquivos com separacao
+// Domain => complexidade de negocio
+// - entity
+// -- customer.ts (regra de negocio)
+// infrastructure (mundo externo) => complexidade acidental
+// - entity (ou model)
+// -- customer.ts (getters e setters)
