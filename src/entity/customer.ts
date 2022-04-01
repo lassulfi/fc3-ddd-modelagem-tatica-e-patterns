@@ -1,11 +1,11 @@
 import Address from "./address";
 
 // Entidade focada em negocio
-class Customer {
-    _id: string;
-    _name: string;
-    _address!: Address; // opcional
-    _active: boolean = false;
+export default class Customer {
+    private _id: string;
+    private _name: string;
+    private _address!: Address; // opcional
+    private _active: boolean = false;
 
     constructor(id: string, name: string) {
         this._id = id;
@@ -14,13 +14,16 @@ class Customer {
     }
 
     validate() {
-        if (this._name.length === 0) {
-            throw new Error("Name is required");
-        }
-
         if (this._id.length === 0) {
             throw new Error("Id is required");
         }
+        if (this._name.length === 0) {
+            throw new Error("Name is required");
+        }
+    }
+
+    get name(): string {
+        return this._name;
     }
 
     changeName(name: string) {
@@ -43,6 +46,10 @@ class Customer {
 
     deactivate() {
         this._active = false;
+    }
+
+    isActive() {
+        return this._active;
     }
 }
 
