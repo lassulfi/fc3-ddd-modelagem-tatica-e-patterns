@@ -40,6 +40,10 @@ export default class Customer {
         this._address = address;
     }
 
+    get address(): Address {
+        return this._address;
+    }
+
     activate() {
         // Regra de negocio: o cliente so pode ser ativado se tiver um
         // endereco para emissao de nota fiscal
