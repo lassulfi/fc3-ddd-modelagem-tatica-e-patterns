@@ -26,6 +26,10 @@ export default class Order {
         return this._items;
     }
 
+    addItem(item: OrderItem) {
+        this._items.push(item);
+    }
+
     validate(): boolean {
         if (this._id.length === 0) {
             throw new Error("Id is required");
@@ -43,6 +47,6 @@ export default class Order {
     }
 
     total() {
-        return this._items.reduce((acc, item) => acc + item.price, 0);
+        return this._items.reduce((acc, item) => acc + item.total(), 0);
     }
 }
