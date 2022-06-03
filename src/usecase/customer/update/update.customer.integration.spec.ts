@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
+import NotificationError from "../../../domain/@shared/notification/notification.error";
 import Customer from "../../../domain/customer/entity/customer";
 import CustomerFactory from "../../../domain/customer/factory/customer.factory";
 import CustomerRepository from "../../../domain/customer/repository/customer.repository";
@@ -7,71 +8,76 @@ import CustomerModel from "../../../infrastructure/customer/repository/sequelize
 import { InputUpdateCustomerDto } from "./update.customer.dto";
 import UpdateCustomerUseCase from "./update.customer.usecase";
 
-
 describe("Integration test update customer use case", () => {
-    let address: Address;
-    let customer: Customer;
-    let input: InputUpdateCustomerDto;
-    let customerRepository: CustomerRepository;
-    
-    let sequelize: Sequelize;
-    beforeEach(async() => {
-        sequelize = new Sequelize({
-            dialect: "sqlite",
-            storage: ":memory:",
-            logging: false,
-            sync: { force: true },
-        });
-        sequelize.addModels([CustomerModel]);
-        await sequelize.sync();
+  let address: Address;
+  let customer: Customer;
+  let input: InputUpdateCustomerDto;
+  let customerRepository: CustomerRepository;
 
-        address = new Address("Street", 123, "zip", "city");
-        customer = CustomerFactory.createWithAddress("John", address);
-
-        customerRepository = new CustomerRepository();
-        customerRepository.create(customer);
-
-        input = {
-            id: customer.id,
-            name: "John Updated",
-            address: {
-                street: "Street Updated",
-                number: 1234,
-                zip: "Zip Updated",
-                city: "City Updated",
-            },
-        };
+  let sequelize: Sequelize;
+  beforeEach(async () => {
+    sequelize = new Sequelize({
+      dialect: "sqlite",
+      storage: ":memory:",
+      logging: false,
+      sync: { force: true },
     });
+    sequelize.addModels([CustomerModel]);
+    await sequelize.sync();
 
-    afterEach(async () => {
-        await sequelize.close();
-    });
+    address = new Address("Street", 123, "zip", "city");
+    customer = CustomerFactory.createWithAddress("John", address);
 
+    customerRepository = new CustomerRepository();
+    customerRepository.create(customer);
 
-    it("should update a customer", async () => {
-        const usecase = new UpdateCustomerUseCase(customerRepository);
+    input = {
+      id: customer.id,
+      name: "John Updated",
+      address: {
+        street: "Street Updated",
+        number: 1234,
+        zip: "Zip Updated",
+        city: "City Updated",
+      },
+    };
+  });
 
-        const output = await usecase.execute(input);
+  afterEach(async () => {
+    await sequelize.close();
+  });
 
-        expect(output).toStrictEqual(input);
-    });
+  it("should update a customer", async () => {
+    const usecase = new UpdateCustomerUseCase(customerRepository);
 
-    it("should thrown an error when name is missing", async () => {
-        const customerRepository = new CustomerRepository();
+    const output = await usecase.execute(input);
 
-        const usecase = new UpdateCustomerUseCase(customerRepository);
+    expect(output).toStrictEqual(input);
+  });
 
-        input.name = "";
+  it("should thrown an error when name is missing", async () => {
+    const customerRepository = new CustomerRepository();
 
-        await expect(usecase.execute(input)).rejects.toThrow("Name is required");
-    });
+    const usecase = new UpdateCustomerUseCase(customerRepository);
 
-    it("should thrown an error when address is missing",async () => {
-        const customerRepository = new CustomerRepository();
+    input.name = "";
 
-        const usecase = new UpdateCustomerUseCase(customerRepository);
-        input.address.street = "";
+    await expect(usecase.execute(input)).rejects.toThrow(
+      new NotificationError([
+        {
+          message: "Name is required",
+          context: "customer",
+        },
+      ])
+    );
+  });
 
-        await expect(usecase.execute(input)).rejects.toThrow("Street is required");
-    });
+  it("should thrown an error when address is missing", async () => {
+    const customerRepository = new CustomerRepository();
+
+    const usecase = new UpdateCustomerUseCase(customerRepository);
+    input.address.street = "";
+
+    await expect(usecase.execute(input)).rejects.toThrow("Street is required");
+  });
 });

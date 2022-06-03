@@ -1,92 +1,110 @@
-
+import Entity from "../../@shared/entity/entity.abstract";
 import EventDispatcherInterface from "../../@shared/event/event-dispatcher.interface";
+import NotificationError from "../../@shared/notification/notification.error";
 import CustomerChangedAddressEvent from "../event/customer-changed-address.event";
 import Address from "../value-objects/address";
 
 // Entidade focada em negocio
-export default class Customer {
-    private _id: string;
-    private _name: string;
-    private _address!: Address; // opcional
-    private _active: boolean = false;
-    private _rewardPoints: number = 0;
-    private _eventDispatcher: EventDispatcherInterface;
+export default class Customer extends Entity {
+  private _name: string;
+  private _address!: Address; // opcional
+  private _active: boolean = false;
+  private _rewardPoints: number = 0;
+  private _eventDispatcher: EventDispatcherInterface;
 
-    constructor(id: string, name: string) {
-        this._id = id;
-        this._name = name;
-        this.validate();
-    }
+  constructor(id: string, name: string) {
+    super();
+    this._id = id;
+    this._name = name;
+    this.validate();
 
-    validate() {
-        if (this._id.length === 0) {
-            throw new Error("Id is required");
-        }
-        if (this._name.length === 0) {
-            throw new Error("Name is required");
-        }
-    }
+    this.notifyIfHasErrors();
+  }
 
-    get id(): string {
-        return this._id;
+  validate() {
+    if (this._id.length === 0) {
+      this.notification.addError({
+        context: "customer",
+        message: "Id is required",
+      });
     }
+    if (this._name.length === 0) {
+      this.notification.addError({
+        context: "customer",
+        message: "Name is required",
+      });
+    }
+  }
 
-    get name(): string {
-        return this._name;
-    }
+  get id(): string {
+    return this._id;
+  }
 
-    changeName(name: string) {
-        this._name = name;
-        this.validate();
-    }
+  get name(): string {
+    return this._name;
+  }
 
-    changeAddress(address: Address) {
-        this._address = address;
-        this.notifyCustomerChangedAddress();
-    }
+  changeName(name: string) {
+    this._name = name;
+    this.validate();
+    this.notifyIfHasErrors();
+  }
 
-    private notifyCustomerChangedAddress() {
-        const eventData = {
-            id: this._id,
-            name: this._name,
-            address: this._address.toString(),
-        };
-        const costumerChangedAddressEvent = new CustomerChangedAddressEvent(eventData);
-        this._eventDispatcher?.notify(costumerChangedAddressEvent);
-    }
+  changeAddress(address: Address) {
+    this._address = address;
+    this.notifyCustomerChangedAddress();
+  }
 
-    get address(): Address {
-        return this._address;
-    }
+  private notifyCustomerChangedAddress() {
+    const eventData = {
+      id: this._id,
+      name: this._name,
+      address: this._address.toString(),
+    };
+    const costumerChangedAddressEvent = new CustomerChangedAddressEvent(
+      eventData
+    );
+    this._eventDispatcher?.notify(costumerChangedAddressEvent);
+  }
 
-    activate() {
-        // Regra de negocio: o cliente so pode ser ativado se tiver um
-        // endereco para emissao de nota fiscal
-        if (!this._address) {
-            throw new Error("Address is mandatory to activate a customer");
-        }
-        this._active = true;
-    }
+  get address(): Address {
+    return this._address;
+  }
 
-    deactivate() {
-        this._active = false;
+  activate() {
+    // Regra de negocio: o cliente so pode ser ativado se tiver um
+    // endereco para emissao de nota fiscal
+    if (!this._address) {
+      throw new Error("Address is mandatory to activate a customer");
     }
+    this._active = true;
+  }
 
-    isActive() {
-        return this._active;
-    }
+  deactivate() {
+    this._active = false;
+  }
 
-    addRewardPoints(points: number) {
-        this._rewardPoints += points;
-    }
+  isActive() {
+    return this._active;
+  }
 
-    get rewardPoints(): number {
-        return this._rewardPoints;
-    }
+  addRewardPoints(points: number) {
+    this._rewardPoints += points;
+  }
 
-    set eventDispatcher(dispatcher: EventDispatcherInterface) {
-        this._eventDispatcher = dispatcher;
+  get rewardPoints(): number {
+    return this._rewardPoints;
+  }
+
+  set eventDispatcher(dispatcher: EventDispatcherInterface) {
+    this._eventDispatcher = dispatcher;
+  }
+
+  private notifyIfHasErrors() {
+    if (this.notification.hasErrors()) {
+      throw new NotificationError(this.notification.errors);
     }
+  }
 }
 
 // Os dados necessitam estar consistentes
