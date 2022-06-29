@@ -29,5 +29,11 @@ describe("Product unit tests", () => {
         const product = new Product("123", "Product 1", 100);
         product.changePrice(200);
         expect(product.price).toBe(200);
+    });
+
+    it("should throw an error when name and price are invalid", () => {
+        expect(() => {
+            const product = new Product("", "", -1);
+        }).toThrowError("product: Id is required, product: Name is required, product: Price must be greater than zero")
     })
 })
