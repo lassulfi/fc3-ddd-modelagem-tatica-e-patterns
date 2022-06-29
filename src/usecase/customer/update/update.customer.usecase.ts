@@ -11,15 +11,15 @@ export default class UpdateCustomerUseCase {
 
     async execute(input: InputUpdateCustomerDto): Promise<OutputUpdateCustomerDto> {
         const customer = await this.customerRepository.find(input.id);
-        customer.changeName(input.name);
         
         const updatedAddress = new Address(
             input.address.street, 
             input.address.number, 
             input.address.zip, 
             input.address.city
-        );
-
+            );
+            
+        customer.changeName(input.name);
         customer.changeAddress(updatedAddress);
 
         await this.customerRepository.update(customer);

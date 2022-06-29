@@ -7,21 +7,21 @@ describe("Customer unit tests", () => {
     expect(() => {
       const customer = new Customer("", "John");
     }).toThrowError(
-      new NotificationError([
-        {
-          message: "Id is required",
-          context: "customer",
-        },
-      ])
+      "customer: Id is required"
     );
   });
   it("should throw error when name is empty", () => {
     expect(() => {
       const customer = new Customer("123", "");
     }).toThrowError(
-      new NotificationError([
-        { message: "Name is required", context: "customer" },
-      ])
+      "customer: Name is required"
+    );
+  });
+  it("should throw error when id and name are missing", () => {
+    expect(() => {
+      const customer = new Customer("", "");
+    }).toThrowError(
+      "customer: Id is required, customer: Name is required"
     );
   });
   it("should change name", () => {
