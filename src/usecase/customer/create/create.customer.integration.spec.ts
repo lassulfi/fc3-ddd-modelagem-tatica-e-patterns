@@ -4,7 +4,7 @@ import CustomerRepository from "../../../domain/customer/repository/customer.rep
 import CustomerModel from "../../../infrastructure/customer/repository/sequelize/customer.model";
 import CreateCustomerUseCase from "./create.customer.usecase";
 
-const input = {
+const getInput = () => ({
   name: "John",
   address: {
     street: "Street",
@@ -12,7 +12,7 @@ const input = {
     zip: "zip",
     city: "city",
   },
-};
+});
 
 describe("Integration test create customer use case", () => {
   let sequelize: Sequelize;
@@ -32,6 +32,8 @@ describe("Integration test create customer use case", () => {
   });
 
   it("should create a customer", async () => {
+    const input = getInput();
+
     const customerRepository = new CustomerRepository();
     const createCustomerUseCase = new CreateCustomerUseCase(customerRepository);
 
@@ -49,6 +51,8 @@ describe("Integration test create customer use case", () => {
     });
   });
   it("should throw an error when name is missing", async () => {
+    const input = getInput();
+
     const customerRepository = new CustomerRepository();
     const createCustomerUseCase = new CreateCustomerUseCase(customerRepository);
 
@@ -65,6 +69,8 @@ describe("Integration test create customer use case", () => {
   });
 
   it("should throw an error when street is missing", async () => {
+    const input = getInput();
+
     const customerRepository = new CustomerRepository();
     const createCustomerUseCase = new CreateCustomerUseCase(customerRepository);
 

@@ -2,6 +2,7 @@ import Entity from "../../@shared/entity/entity.abstract";
 import EventDispatcherInterface from "../../@shared/event/event-dispatcher.interface";
 import NotificationError from "../../@shared/notification/notification.error";
 import CustomerChangedAddressEvent from "../event/customer-changed-address.event";
+import CustomerValidatorFactory from "../factory/customer.validator.factory";
 import Address from "../value-objects/address";
 
 // Entidade focada em negocio
@@ -22,18 +23,8 @@ export default class Customer extends Entity {
   }
 
   validate() {
-    if (this._id.length === 0) {
-      this.notification.addError({
-        context: "customer",
-        message: "Id is required",
-      });
-    }
-    if (this._name.length === 0) {
-      this.notification.addError({
-        context: "customer",
-        message: "Name is required",
-      });
-    }
+    const validator = CustomerValidatorFactory.create();
+    validator.validate(this);
   }
 
   get id(): string {

@@ -1,17 +1,25 @@
 // Objeto de valor
+
+import NotificationError from "../../@shared/notification/notification.error";
+import ValueObject from "../../@shared/value-objects/value-object.abstract";
+import AddressValidatorFactory from "./factory/address.validator.factory";
+
 // Objetos de valor não possuem id e são imutáveis
-export default class Address {
+export default class Address extends ValueObject {
     private _street: string = "";
     private _number: number = 0;
     private _zip: string = "";
     private _city: string = "";
 
     constructor(street: string, number: number, zip: string, city: string) {
+        super();
         this._street = street;
         this._number = number;
         this._zip = zip;
         this._city = city;
+        
         this.validate();
+        this.notifyIfHasErrors();
     }
 
     get street(): string {
@@ -31,18 +39,8 @@ export default class Address {
     }
 
     validate() {
-        if (this._street.length === 0) {
-            throw new Error("Street is required");
-        }
-        if (this._number === 0) {
-            throw new Error("Number is required");
-        }
-        if (this._zip.length === 0) {
-            throw new Error("Zip code is required");
-        }
-        if (this._city.length === 0) {
-            throw new Error("City is required");
-        }
+        const validator = AddressValidatorFactory.create();
+        validator.validate(this);
     }
 
     toString() {
