@@ -163,6 +163,48 @@ describe("E2E test for customer", () => {
             .send(updateCustomerDto);
         expect(updateCustomerResponse.status).toBe(500);
     });
+
+    it("should list response as XML", async () => {
+        const createResponse1 = await createCustomer({
+            name: "John",
+            address: {
+                street: "Street 1",
+                city: "City 1",
+                number: 1,
+                zip: "11111"
+            }
+        });
+    const createResponse2 = await createCustomer({
+            name: "Jane",
+            address: {
+                street: "Street 2",
+                city: "City 2",
+                number: 2,
+                zip: "22222"
+            }
+        });
+        
+    const findAllResponseXML = await request(app).get("/customers").set("accept", "application/xml").send();
+    expect(findAllResponseXML.status).toBe(200);
+    expect(findAllResponseXML.text).toContain(`<?xml version="1.0" encoding="UTF-8"?>`);
+    expect(findAllResponseXML.text).toContain("<customers>");
+    expect(findAllResponseXML.text).toContain("<customer>");
+    expect(findAllResponseXML.text).toContain("<name>John</name>");
+    expect(findAllResponseXML.text).toContain("<address>");
+    expect(findAllResponseXML.text).toContain("<street>Street 1</street>");
+    expect(findAllResponseXML.text).toContain("<city>City 1</city>");
+    expect(findAllResponseXML.text).toContain("<number>1</number>");
+    expect(findAllResponseXML.text).toContain("<zip>11111</zip>");
+    expect(findAllResponseXML.text).toContain("</address>");
+    expect(findAllResponseXML.text).toContain("</customer>");
+    expect(findAllResponseXML.text).toContain("<customer>");
+    expect(findAllResponseXML.text).toContain("<name>Jane</name>");
+    expect(findAllResponseXML.text).toContain("<street>Street 2</street>");
+    expect(findAllResponseXML.text).toContain("<city>City 2</city>");
+    expect(findAllResponseXML.text).toContain("<number>2</number>");
+    expect(findAllResponseXML.text).toContain("<zip>22222</zip>");
+    expect(findAllResponseXML.text).toContain("</customers>");
+    });
 });
 
 async function createCustomer(createCustomerDto: InputCreateCustomerDto) {
